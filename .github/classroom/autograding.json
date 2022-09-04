@@ -1,0 +1,34 @@
+{
+  "tests": [
+    {
+      "name": "Корректный запуск. Возвращаемое значение",
+      "setup": "make test",
+      "run": ".github/test_ret_val.sh 0",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Некорректные аргументы. Возвращаемое значение",
+      "setup": "make test",
+      "run": ".github/test_ret_val.sh -2 2 0.01 0.01 0.2 100 1000",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 20
+    },
+    {
+      "name": "Корректный запуск.",
+      "setup": "make test",
+      "run": "./kursach 2 0.01 0.01 0.2 100 1000 -30",
+      "input": "",
+      "output": "start mass | start height | start velocity | fulltrust time | end height | ending speed | used fuel | full time | landed",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 30
+    }
+  ]
+}
