@@ -10,10 +10,10 @@ void func51 (void)
     double z;
     double temp;
 
-    for (int i=1;h > pow (10., -4);i++)
+    for (int i=1;h > pow (10., -5);i++)
     {
-	printf ("Func 5.%d:\nh = %5.4f\n      T      |  x*(T)-x(T)  |  z*(T)-z(T)\n", i, h);
-        while (T<pow(10.,6))
+	printf ("Func 5.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  z*(T)-z(T)\n", i, h);
+        while (T < pow(10.,6)*pi)
         {
             x=0.;
             z=1.;
