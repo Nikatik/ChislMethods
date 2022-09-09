@@ -17,14 +17,14 @@ void func51 (void)
         {
             x=0.;
             z=1.;
-            for(int j=0;j*h<T;j++)
+            for(unsigned long long int j=0; (double) j * h < T; j++)
             {
-                temp = x;
+                temp=x;
                 x+=h*z;
                 z-=h*temp;
             }
-           _Pragma ("GCC diagnostic push");
-           _Pragma ("GCC diagnostic ignored \"-Wfloat-equal\"");
+            _Pragma ("GCC diagnostic push");
+            _Pragma ("GCC diagnostic ignored \"-Wfloat-equal\"");
             if(x!=x||z!=z) break;
             _Pragma ("GCC diagnostic pop");
             printf(" %7.0fPi   | %11.3e  | %11.3e  \n", (int) T/pi, x-sin(T), z-cos(T));
