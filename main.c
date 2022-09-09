@@ -19,6 +19,8 @@ void all(void)
         func41();
         func42();
         printf ("\n");
+
+        func51();
 }
 
 int main (int argc, char* argv[])
@@ -51,7 +53,7 @@ int main (int argc, char* argv[])
                 break;
 
             case '5':
-
+                func51();
                 break;
 
             case '6':

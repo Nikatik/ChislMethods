@@ -18,4 +18,5 @@ void func31 (void);
 void func41 (void);
 void func42 (void);
 
+void func51 (void);
 #endif
