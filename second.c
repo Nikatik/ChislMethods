@@ -1,6 +1,6 @@
 #include "lib.h"
 
-double f (double);
+double f (double x);
 
 double func21 (void)
 {

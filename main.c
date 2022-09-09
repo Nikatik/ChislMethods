@@ -55,7 +55,7 @@ int main (int argc, char* argv[])
             case '5':
                 func51();
                 break;
-
+/*
             case '6':
 
                 break;
@@ -67,7 +67,7 @@ int main (int argc, char* argv[])
             case '8':
 
                 break;
-
+*/
             default:
                 all();
 

@@ -1,12 +1,15 @@
 #include "lib.h"
-double el1 (double, double);
-double dmf (double);
-double el2 (double, double);
+#define max1 10
+#define max2 5
+
+double el1 (double x, double h);
+double dmf (double x);
+double el2 (double x, double h);
 
 double el1 (double x, double h)
 {
     double res = x;
-    for (int i = 0; i < 10 / h; i++)
+    for (int i = 0; i < max1 / h; i++)
     {
         res += h * h * i;
     }
@@ -17,9 +20,9 @@ void func41 (void)
 {
     double x    = 0;
     double h    = 1;
-    double temp = pow (10., 2) / 2;
+    double temp = pow (max1, 2) / 2;
     printf ("Func 4.a:\n  h     |      R1");
-    while (h > pow (10., -5))
+    while (h > pow (10., -7))
     {
         printf ("\n%.0e\t|%13.4e", h, temp - el1 (x, h));
         h *= 0.1;
@@ -35,7 +38,7 @@ double dmf (double x)
 double el2 (double x, double h)
 {
     double res = x;
-    for (int i = 0; i < 3 / h; i++)
+    for (int i = 0; i < max2 / h; i++)
     {
         res += h * dmf (h * i);
     }
@@ -46,9 +49,9 @@ void func42 (void)
 {
     double x    = 9;
     double h    = 1;
-    double temp = mf (3);
+    double temp = mf (max2);
     printf ("\nFunc 4.b:\n  h     |      R1");
-    while (h > pow (10., -5))
+    while (h > pow (10., -7))
     {
         printf ("\n%.0e\t|%13.4e", h, temp - el2 (x, h));
         h *= 0.1;
