@@ -20,4 +20,3 @@ void func31 (void)
     }
     printf ("\n");
 }
-

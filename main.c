@@ -1,26 +1,26 @@
 #include "lib.h"
 
-void all(void)
+void all (void)
 {
-        printf ("Func 1.a:%13.4e\nFunc 1.b:%13.4e\nFunc 1.c:%13.4e\n",
-                ldexp (1., -func1()),
-                func2(),
-                func3());
+    printf ("Func 1.a:%13.4e\nFunc 1.b:%13.4e\nFunc 1.c:%13.4e\n",
+            ldexp (1., -func1()),
+            func2(),
+            func3());
 
-        printf ("\nFunc 2.a:%13.4e\nFunc 2.b:%13.4e\nFunc 2.c:%13.4e\n",
-                func21(),
-                func22(),
-                func23());
-        printf ("\n");
+    printf ("\nFunc 2.a:%13.4e\nFunc 2.b:%13.4e\nFunc 2.c:%13.4e\n",
+            func21(),
+            func22(),
+            func23());
+    printf ("\n");
 
-        func31();
-        printf ("\n");
+    func31();
+    printf ("\n");
 
-        func41();
-        func42();
-        printf ("\n");
+    func41();
+    func42();
+    printf ("\n");
 
-        func51();
+    func51();
 }
 
 int main (int argc, char* argv[])
@@ -55,22 +55,21 @@ int main (int argc, char* argv[])
             case '5':
                 func51();
                 break;
-/*
-            case '6':
+                /*
+                            case '6':
 
-                break;
+                                break;
 
-            case '7':
+                            case '7':
 
-                break;
+                                break;
 
-            case '8':
+                            case '8':
 
-                break;
-*/
+                                break;
+                */
             default:
                 all();
-
         }
     }
     else
