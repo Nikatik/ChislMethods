@@ -13,10 +13,10 @@ void func31 (void)
     printf ("Func 3:\n  h     |      R1");
     for (int i = 1; i < 21; i++)
     {
-        h = pow (10., -i) / 2.;
+        h = pow (10., -i);
         printf ("\n%.0e\t|%13.4e",
-                2 * h,
-                fabs (30. - (mf (x + h) - mf (x - h)) / (2 * h)));
+                h,
+                fabs (30. - (mf (x + h) - mf (x)) / (h)));
     }
     printf ("\n");
 }

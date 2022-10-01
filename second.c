@@ -16,7 +16,7 @@ double func21 (void)
 double func22 (void)
 {
     int n    = 31;
-    double x = log (6.1 / 6.);
+    double x = 0;
     for (int i = 60; i >= n; i--)
     {
         x = (1. / i - x) / 6.;
@@ -35,7 +35,7 @@ double func23 (void)
     double x   = 0;
     while (x < 1)
     {
-        res += (f (x) + f (x + pow (10., -3))) * pow (10., -3);
+        res += (f (x) + f (x + pow (10., -3))) * pow (10., -3) * 0.5;
         x += pow (10., -3);
     }
     return res;
