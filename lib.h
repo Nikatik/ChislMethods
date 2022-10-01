@@ -4,6 +4,9 @@
 #include <math.h>
 #include <stdio.h>
 
+#define EPS pow (10, -15)
+#define pi 3.14159265359
+
 int func1 (void);
 double func2 (void);
 double func3 (void);
