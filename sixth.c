@@ -115,7 +115,7 @@ void func61 (void)
         cab[0][i] = rd (inpf);
     }
 
-    for (unsigned int i = 2; i < s + 2; i++)
+    for (unsigned int i = 2; i < s + 3; i++)
         for (unsigned int j = 0; j + 1 < i && j < s && !feof (inpf); j++)
             cab[i][j] = rd (inpf);
 
@@ -127,7 +127,7 @@ void func61 (void)
     }
 
     fclose (inpf);
-    for (int i = 0; i < s + 3; i++)
+    for (unsigned int i = 0; i < s + 3; i++)
         free (cab[i]);
     free (cab);
 }
