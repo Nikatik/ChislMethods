@@ -14,9 +14,7 @@ void func31 (void)
     for (int i = 1; i < 21; i++)
     {
         h = pow (10., -i);
-        printf ("\n%.0e\t|%13.4e",
-                h,
-                fabs (30. - (mf (x + h) - mf (x)) / (h)));
+        printf ("\n%.0e\t|%13.4e", h, fabs (30. - (mf (x + h) - mf (x)) / (h)));
     }
     printf ("\n");
 }

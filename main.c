@@ -21,6 +21,8 @@ void all (void)
     printf ("\n");
 
     func51();
+
+    func61();
 }
 
 int main (int argc, char* argv[])
@@ -55,11 +57,12 @@ int main (int argc, char* argv[])
             case '5':
                 func51();
                 break;
+
+            case '6':
+                func61();
+                break;
+
                 /*
-                            case '6':
-
-                                break;
-
                             case '7':
 
                                 break;
