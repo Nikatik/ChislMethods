@@ -87,6 +87,7 @@ double RK (double x0,
         {
             temp += cab[i + 1][j] * k[j];
         }
+        //printf("%f\n",f(1,0));
         k[i] = f (x0 + h * cab[0][i], y0 + h * temp);
     }
 
@@ -179,7 +180,7 @@ void func61 (void)
 
     // Runge–Kutta for x,y
 
-    for (int i = 1; h > 5 * pow (10., -5); i++)
+    for (int i = 1; h > 5 * pow (10., -6); i++)
     {
         printf ("Func 6.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
@@ -200,7 +201,6 @@ void func61 (void)
                 temp = x;
                 x    = RK (y, x, h, s, k, cab, xg);
                 y    = RK (temp, y, h, s, k, cab, yf);
-
                 dist += h;
             }
             h = tmp;
