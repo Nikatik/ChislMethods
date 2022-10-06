@@ -125,7 +125,7 @@ void func61 (void)
 
     // file check
 
-    FILE* inpf = fopen ("koef (8DP).txt", "r");
+    FILE* inpf = fopen ("koef (8).txt", "r");
     if (inpf == NULL)
     {
         printf ("File doen`t exist\n");
