@@ -125,7 +125,7 @@ void func61 (void)
 
     // file check
 
-    FILE* inpf = fopen ("koef (8).txt", "r");
+    FILE* inpf = fopen ("koef (8DP).txt", "r");
     if (inpf == NULL)
     {
         printf ("File doen`t exist\n");
@@ -189,7 +189,7 @@ void func61 (void)
 
     // Runge–Kutta for x,y
 
-    for (int i = 1; h > 5 * pow (10., -6); i++)
+    for (int i = 1; h > 5 * pow (10., -3); i++)
     {
         printf ("Func 6.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
@@ -246,5 +246,7 @@ void func61 (void)
         free (cab[i]);
     }
     free (cab);
+    free (k[0]);
+    free (k[1]);
     free (k);
 }

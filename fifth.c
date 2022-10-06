@@ -2,7 +2,7 @@
 
 void func51 (void)
 {
-    double h = 0.1;
+    double h = 1;
     double T = 5 * pi;
     double tmp;
 
@@ -11,7 +11,7 @@ void func51 (void)
     double temp;
     double dist;
 
-    for (int i = 1; h > 5 * pow (10., -6); i++)
+    for (int i = 1; h > 5 * pow (10., -3); i++)
     {
         printf ("Func 5.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
