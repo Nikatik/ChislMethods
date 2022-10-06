@@ -1,5 +1,6 @@
 #include "lib.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 int rs (FILE* inpf)        // reading string with word separation
 {
@@ -76,7 +77,8 @@ void RK (double t,
            double h,
            unsigned int s,
            double** k,
-           double** cab)        // Runge–Kutta in general form
+           double** cab,
+           bool check)        // Runge–Kutta in general form
 {
     double tempx;
     double tempy;
@@ -97,11 +99,22 @@ void RK (double t,
 
     tempx = 0;
     tempy = 0;
-    for (unsigned int i = 0; i < s; i++)
+    if(check)
     {
-        tempx += cab[s + 1][i] * k[0][i];
-        tempy += cab[s + 1][i] * k[1][i];
+        for (unsigned int i = 0; i < s; i++)
+        {
+            tempx += cab[s + 2][i] * k[0][i];
+            tempy += cab[s + 2][i] * k[1][i];
+        }
+    }else
+    {
+        for (unsigned int i = 0; i < s; i++)
+        {
+            tempx += cab[s + 1][i] * k[0][i];
+            tempy += cab[s + 1][i] * k[1][i];
+        }
     }
+
 
     *x0 += h * tempx;
     *y0 += h * tempy;
@@ -125,7 +138,7 @@ void func61 (void)
 
     // file check
 
-    FILE* inpf = fopen ("koef (8).txt", "r");
+    FILE* inpf = fopen ("koef (5).txt", "r");
     if (inpf == NULL)
     {
         printf ("File doen`t exist\n");
@@ -207,7 +220,7 @@ void func61 (void)
             {
                 if (dist + h > T) h = T - dist;
 
-                RK (0, &x, &y, h, s, k, cab);
+                RK (0, &x, &y, h, s, k, cab, false);
                 dist += h;
             }
             h = tmp;
