@@ -58,61 +58,67 @@ double rd (FILE* inpf)        // reading floating point number from a/b format
 
 _Pragma ("GCC diagnostic push")
 _Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"")
-static double yf (double x, double y)        // y`=yf(x,y)
+static double yf (double t, double x, double y)        // y`=yf(x,y)
 {
     return -x;
 }
 
-static double xg (double y, double x)        // x`=xg(y,x)
+static double xg (double t, double x, double y)        // x`=xg(y,x)
 {
     return y;
 }
 
 _Pragma ("GCC diagnostic pop")
 
-double RK (double x0,
-           double y0,
+void RK (double t,
+           double* x0,
+           double* y0,
            double h,
            unsigned int s,
-           double* k,
-           double** cab,
-           double f (double, double))        // Runge–Kutta in general form
+           double** k,
+           double** cab)        // Runge–Kutta in general form
 {
-    double temp;
+    double tempx;
+    double tempy;
 
     for (unsigned int i = 0; i < s; i++)
     {
-        temp = 0;
+        tempx = 0;
+        tempy = 0;
         for (unsigned int j = 0; j < i; j++)
         {
-            temp += cab[i + 1][j] * k[j];
+            tempx += cab[i + 1][j] * k[0][j];
+            tempy += cab[i + 1][j] * k[1][j];
         }
         //printf("%f\n",f(1,0));
-        k[i] = f (x0 + h * cab[0][i], y0 + h * temp);
+        k[0][i] = xg (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
+        k[1][i] = yf (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
     }
 
-    temp = 0;
+    tempx = 0;
+    tempy = 0;
     for (unsigned int i = 0; i < s; i++)
     {
-        temp += cab[s + 1][i] * k[i];
+        tempx += cab[s + 1][i] * k[0][i];
+        tempy += cab[s + 1][i] * k[1][i];
     }
 
-    return y0 + h * temp;
+    *x0 += h * tempx;
+    *y0 += h * tempy;
 }
 
 void func61 (void)
 {
-    double h = 0.1;
+    double h = 1;
     double T = 5 * pi;
     double tmp;
 
     double x;
     double y;
-    double temp;
     double dist;
 
     unsigned int s;
-    double* k;
+    double** k;
     double** cab;
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -146,10 +152,13 @@ void func61 (void)
         }
     }
 
-    k = (double*)malloc (s * sizeof (double));
+    k = (double**)malloc (2 * sizeof (double*));
+    k[0] = (double*)malloc (s * sizeof (double));
+    k[1] = (double*)malloc (s * sizeof (double));
     for (unsigned int i = 0; i < s; i++)
     {
-        k[i] = 0;
+        k[0][i] = 0;
+        k[1][i] = 0;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -164,9 +173,9 @@ void func61 (void)
     for (unsigned int i = 2; i < s + 3; i++)
         for (unsigned int j = 0; j + 1 < i && j < s && !feof (inpf); j++)
             cab[i][j] = rd (inpf);
-    /*
-        // CAB mmatrix printing
-
+    
+        // CAB matrix printing
+/*
         printf ("\n");
         for (unsigned int i = 0; i < s + 3; i++)
         {
@@ -198,9 +207,7 @@ void func61 (void)
             {
                 if (dist + h > T) h = T - dist;
 
-                temp = x;
-                x    = RK (y, x, h, s, k, cab, xg);
-                y    = RK (temp, y, h, s, k, cab, yf);
+                RK (0, &x, &y, h, s, k, cab);
                 dist += h;
             }
             h = tmp;
@@ -221,21 +228,6 @@ void func61 (void)
             if (T < 9. * pi)
             {
                 T += 5 * pi;
-                continue;
-            }
-            if (T > 95000. * pi)
-            {
-                T += 100000. * pi;
-                continue;
-            }
-            if (h > 0.005 && T > 9500. * pi)
-            {
-                T += 10000. * pi;
-                continue;
-            }
-            if (h > 0.05 && T > 950. * pi)
-            {
-                T += 1000. * pi;
                 continue;
             }
             T *= 10.;
