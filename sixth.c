@@ -1,7 +1,7 @@
 #include "lib.h"
 #include <stdlib.h>
-#include <stdbool.h>
 
+/*
 int rs (FILE* inpf)        // reading string with word separation
 {
     int count = 0;
@@ -43,7 +43,7 @@ int rs (FILE* inpf)        // reading string with word separation
     }
     return 1;
 }
-
+*/
 double rd (FILE* inpf)        // reading floating point number from a/b format
 {
     int chisl = 0;
@@ -58,7 +58,7 @@ double rd (FILE* inpf)        // reading floating point number from a/b format
 }
 
 _Pragma ("GCC diagnostic push")
-_Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"")
+_Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"") 
 static double yf (double t, double x, double y)        // y`=yf(x,y)
 {
     return -x;
@@ -72,13 +72,15 @@ static double xg (double t, double x, double y)        // x`=xg(y,x)
 _Pragma ("GCC diagnostic pop")
 
 void RK (double t,
-           double* x0,
-           double* y0,
-           double h,
-           unsigned int s,
-           double** k,
-           double** cab,
-           bool check)        // Runge–Kutta in general form
+         double* x0,
+         double* y0,
+         double h,
+         unsigned int s,
+         double** k,
+         double** cab,
+         double f (double, double, double),
+         double g (double, double, double),
+         bool check)        // Runge–Kutta in general form
 {
     double tempx;
     double tempy;
@@ -92,21 +94,22 @@ void RK (double t,
             tempx += cab[i + 1][j] * k[0][j];
             tempy += cab[i + 1][j] * k[1][j];
         }
-        //printf("%f\n",f(1,0));
-        k[0][i] = xg (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
-        k[1][i] = yf (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
+        // printf("%f\n",f(1,0));
+        k[0][i] = g (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
+        k[1][i] = f (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
     }
 
     tempx = 0;
     tempy = 0;
-    if(check)
+    if (check)
     {
         for (unsigned int i = 0; i < s; i++)
         {
             tempx += cab[s + 2][i] * k[0][i];
             tempy += cab[s + 2][i] * k[1][i];
         }
-    }else
+    }
+    else
     {
         for (unsigned int i = 0; i < s; i++)
         {
@@ -114,7 +117,6 @@ void RK (double t,
             tempy += cab[s + 1][i] * k[1][i];
         }
     }
-
 
     *x0 += h * tempx;
     *y0 += h * tempy;
@@ -138,13 +140,13 @@ void func61 (void)
 
     // file check
 
-    FILE* inpf = fopen ("koef (5).txt", "r");
+    FILE* inpf = fopen ("koef (8).txt", "r");
     if (inpf == NULL)
     {
         printf ("File doen`t exist\n");
         return;
     }
-    if (!fscanf (inpf, "%ud", &s))
+    if (!fscanf (inpf, "%ud", &s) || !fscanf (inpf, "%ud", &s))
     {
         printf ("File isn`t correct\n");
         fclose (inpf);
@@ -165,7 +167,7 @@ void func61 (void)
         }
     }
 
-    k = (double**)malloc (2 * sizeof (double*));
+    k    = (double**)malloc (2 * sizeof (double*));
     k[0] = (double*)malloc (s * sizeof (double));
     k[1] = (double*)malloc (s * sizeof (double));
     for (unsigned int i = 0; i < s; i++)
@@ -186,21 +188,21 @@ void func61 (void)
     for (unsigned int i = 2; i < s + 3; i++)
         for (unsigned int j = 0; j + 1 < i && j < s && !feof (inpf); j++)
             cab[i][j] = rd (inpf);
-    
-        // CAB matrix printing
-/*
-        printf ("\n");
-        for (unsigned int i = 0; i < s + 3; i++)
-        {
-            for (unsigned int j = 0; j < s; j++)
-                printf ("%6.3f ", cab[i][j]);
+
+    // CAB matrix printing
+    /*
             printf ("\n");
-        }
-        printf ("\n");
-    */
+            for (unsigned int i = 0; i < s + 3; i++)
+            {
+                for (unsigned int j = 0; j < s; j++)
+                    printf ("%6.3f ", cab[i][j]);
+                printf ("\n");
+            }
+            printf ("\n");
+        */
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    // Runge–Kutta for x,y
+    // Runge–Kutta for harmonic oscillator
 
     for (int i = 1; h > 5 * pow (10., -3); i++)
     {
@@ -220,7 +222,7 @@ void func61 (void)
             {
                 if (dist + h > T) h = T - dist;
 
-                RK (0, &x, &y, h, s, k, cab, false);
+                RK (0, &x, &y, h, s, k, cab, yf, xg, false);
                 dist += h;
             }
             h = tmp;
@@ -253,6 +255,8 @@ void func61 (void)
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
+    // cleaning :)
+    
     fclose (inpf);
     for (unsigned int i = 0; i < s + 3; i++)
     {

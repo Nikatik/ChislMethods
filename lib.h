@@ -2,6 +2,7 @@
 #define LIB_H_INCLUDED
 
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #define EPS pow (10, -15)
@@ -23,5 +24,18 @@ void func42 (void);
 
 void func51 (void);
 
+double rd (FILE*);
+void RK (double,
+         double*,
+         double*,
+         double,
+         unsigned int,
+         double**,
+         double**,
+         double f (double, double, double),
+         double g (double, double, double),
+         bool);
 void func61 (void);
+
+void func71 (void);
 #endif
