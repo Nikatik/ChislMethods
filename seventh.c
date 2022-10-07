@@ -6,12 +6,12 @@ _Pragma ("GCC diagnostic push")
 _Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"") 
 static double myf (double t, double x, double y)        // y`=yf(x,y)
 {
-    return 3 * x - pow (x, 2) * y;
+    return -2*t*y*log(fmax(x,pow(10,-3)));
 }
 
 static double mxg (double t, double x, double y)        // x`=xg(y,x)
 {
-    return 1 + pow (x, 2) * y - 4 * x;
+    return 2*t*x*log(fmax(y,pow(10,-3)));
 }
 
 static double yf (double t, double x, double y)        // y`=yf(x,y)
@@ -45,14 +45,14 @@ void astep (double T,
     *x_ = tempx = *x;
     *y_ = tempy = *y;
     dist        = 0;
-    h           = 0.1;
+    h           = 0.01;
     fac         = 1.7;
     for (*i = *j = 0; T - dist > EPS;)
     {
         if (dist + h > T) h = T - dist;
 
-        RK (0, &tempx, &tempy, h, s, k, cab, f, g, false);
-        RK (0, x_, y_, h, s, k, cab, f, g, true);
+        RK (dist, &tempx, &tempy, h, s, k, cab, f, g, false);
+        RK (dist, x_, y_, h, s, k, cab, f, g, true);
 
         temp = h;
         h *= fmin (fac,
@@ -61,6 +61,11 @@ void astep (double T,
                                   fmax (fabs (tempx - *x_), fabs (tempy - *y_)),
                               1. / (p + 1))));
 
+        if (h<pow(10,-18))
+        {
+            printf("\nSomething goes wrong...\n");
+            return;
+        }
         if (fmax (fabs (tempx - *x_), fabs (tempy - *y_)) > tol)
         {
             *x_ = tempx = *x;
@@ -174,7 +179,7 @@ void func71 (void)
         printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)  |      i      |      j\n",
                 tol);
-        for (; T < 5 * pow (10, 6) * pi;)
+        for (; T < 1.5 * pow (10, 6) * pi;)
         {
             x = 0;
             y = 1;
@@ -204,22 +209,38 @@ void func71 (void)
         }
         printf ("\n");
     }
+    
+    double tempx7 = 0, tempy7 = 1, tempx9 = 0, tempy9 = 1;
+    astep (pow(10,6)*pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), yf, xg);
+    astep (pow(10,6)*pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), yf, xg);
+    printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",pow(10,6),fabs((tempx7-tempx9)/(tempx9-x)),pow(10,6),fabs((tempy7-tempy9)/(tempy9-y)));
+    for(T=75*pow(10,4)*pi;T>10*pow(10,4)*pi;T-=25*pow(10,4)*pi)
+    {
+        x=tempx7=tempx9=0;
+        y=tempy7=tempy9=1;
+        astep (T, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), yf, xg);
+        astep (T, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), yf, xg);
+        astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-11), yf, xg);
+        printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",T/pi,fabs((tempx7-tempx9)/(tempx9-x)),T/pi,fabs((tempy7-tempy9)/(tempy9-y)));
+
+    }
+    printf("\n\n");
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    // Runge-Kutta for brusselator
+    // Runge-Kutta for brusselator ... OH, NO, IT`S SOMETHING DIFFERENT!!! WTF!?1?
 
     printf ("Func 7.2: \n");
     for (tol = pow (10, -7); tol > 5 * pow (10, -12); tol *= 0.01)
     {
-        T = 5;
-        printf ("Tolerance = %.0e\n     T    |  x*(T)-x(T)  |  "
+        T = 5.*pi;
+        printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)  |      i       |      j\n",
                 tol);
-        for (; T < 1.5 * pow (10, 6);)
+        for (; T < 1.5 * pow (10, 3) * pi;)
         {
-            x = 1.01;
-            y = 3;
+            x = 1;
+            y = exp(1);
 
             astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, myf, mxg);
 
@@ -231,22 +252,39 @@ void func71 (void)
             }
             _Pragma ("GCC diagnostic pop");
 
-            printf (" %7.0f  | %11.3e  | %11.3e  | %10llu   | %10llu  \n",
-                    T,
+            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu   | %10llu  \n",
+                    T/pi,
                     x - x_,
                     y - y_,
                     i,
                     j);
 
-            if (T < 9)
+            if (T < 9.*pi)
             {
-                T += 5;
+                T += 5.*pi;
                 continue;
             }
             T *= 10.;
         }
         printf ("\n");
     }
+    
+    tempx7 = tempx9 = 1;
+    tempy7 = tempy9 = exp(1);
+    astep (pow(10,3)*pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), myf, mxg);
+    astep (pow(10,3)*pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), myf, mxg);
+    printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",pow(10,3),fabs((tempx7-tempx9)/(tempx9-x)),pow(10,3),fabs((tempy7-tempy9)/(tempy9-y)));
+    for(T=750*pi;T>100*pi;T-=250*pi)
+    {
+        x=tempx7=tempx9=1;
+        y=tempy7=tempy9=exp(1);
+        astep (T, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), myf, mxg);
+        astep (T, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), myf, mxg);
+        astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-11), myf, mxg);
+        printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",T/pi,fabs((tempx7-tempx9)/(tempx9-x)),T/pi,fabs((tempy7-tempy9)/(tempy9-y)));
+
+    }
+    printf("\n\n");
     
     /////////////////////////////////////////////////////////////////////////////////////////
 
