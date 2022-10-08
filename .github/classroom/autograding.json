@@ -27,7 +27,7 @@
       "input": "",
       "output": "Func 4.b",
       "comparison": "included",
-      "timeout": 100,
+      "timeout": 360,
       "points": 50
     }
   ]
