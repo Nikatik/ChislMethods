@@ -1,18 +1,19 @@
 #include "lib.h"
 #include <stdlib.h>
 #include <time.h>
-
+#define EPSM pow(10, -7)
 _Pragma ("GCC diagnostic push")
 _Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"") 
 
 static double yf (double t, double x, double y)        // y`=yf(x,y)
 {
-    return cos(t)-(1+0.01*pow(x,2))*x;
+    return x;
 }
 
 static double xg (double t, double x, double y)        // x`=xg(y,x)
 {
-    return y;
+    //return -y;
+    return cos(t)-(1+0.2*pow(y,2))*y;
 }
 
 _Pragma ("GCC diagnostic pop")
@@ -38,7 +39,8 @@ void astepCH (double* startx,
     double h;           //  real step 
     double temp;        //  theoretical step
     double fac;         //  multiplier for step
-    unsigned int l = 0; //  crossing starty checker
+    bool first;
+    bool start = true;
     
     leftx = x_ = tempx = x = *startx;
     y_ = tempy = y = *starty;
@@ -47,6 +49,7 @@ void astepCH (double* startx,
     
     for (;;)
     {
+        first = false;
 
         RK (*dist, &tempx, &tempy, h, s, k, cab, f, g, false);
         RK (*dist, &x_, &y_, h, s, k, cab, f, g, true);
@@ -75,11 +78,11 @@ void astepCH (double* startx,
         //check
         if((y - *starty) * (tempy - *starty) < 0)                                               // next step crossed starty
         {
-            l++;
-            if(l%2==0)                                                                          // cross after full rotation
+            if((leftx - *startx) * (tempx - *startx) > 0)                                       // cross after full rotation
             {
+                //printf("|\n");
                 double _y = y, _x = x, _h = temp, _dist = *dist;
-                for(;fabs(_y - *starty) > EPS;)                                                 // finding point of crossing
+                for(;fabs(_y - *starty) > EPSM;)                                                 // finding point of crossing
                 {
                     if((_y - *starty) * (tempy - *starty) < 0){
                         
@@ -107,13 +110,24 @@ void astepCH (double* startx,
                 tempy = y;
                 temp = _dist - *dist;
                 RK (*dist, &tempx, &tempy, temp, s, k, cab, f, g, false);                        // counting starty point
-                if(fabs(leftx - tempx) > EPS)
+                if(fabs(leftx - tempx) > EPSM)
+                {
                     leftx = tempx;
+                    first = true;
+                }
+            }
+            
+            if(start)
+            {
+                leftx = tempx;
+                first = true;
+                start = false;
             }
         }
         
         *dist += temp;
-        if(fabs(tempx - leftx) < EPS)                                                           // closed loop
+        if(fabs(tempx - leftx) < EPSM && !first)                                                           // closed loop
+        //if(*dist > 1.3 * pow(10,2))
         { 
             x  = tempx;
             y  = tempy;
@@ -123,8 +137,7 @@ void astepCH (double* startx,
         y  = tempy;
         fac = 1.7;
         
-        //printf ("%.17e\n",
-        //    y);
+        //printf ("%.17E\n", x);
     }
     *startx = x;
     *starty = y;
@@ -133,7 +146,7 @@ void astepCH (double* startx,
 void func81 (void)
 {
     double dist = 0;
-    double tol           = EPS * 0.001;
+    double tol           = EPSM * pow(10, -7);
     long long unsigned i = 0;
     long long unsigned j = 0;
 
@@ -223,11 +236,14 @@ void func81 (void)
     
     x = 0;
     y = 1;
-
+/*
+    x=cos(dist);
+    y=sin(dist);
+*/    
     astepCH (&x, &y, &dist, p, s, k, cab, tol, yf, xg);
 
     fractpart = modf (dist, &intpart);
-    
+//    /*
     printf ("%.0f + %.3f  | %11.3e  | %11.3e  \n",
             intpart,
             fractpart,
@@ -235,7 +251,7 @@ void func81 (void)
             y);
     
     printf ("\n");
-    
+  //  */   
     /////////////////////////////////////////////////////////////////////////////////////////
 
     // cleaning :)
