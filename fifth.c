@@ -18,7 +18,7 @@ void func51 (void)
                 i,
                 h);
 
-        while (T < 1.5 * pow (10., 6) * pi)
+        while (T < 1.5 * pow (10., 4) * pi)
         {
             x    = 0.;
             z    = 1.;
@@ -31,6 +31,7 @@ void func51 (void)
                 x += h * z;
                 z -= h * temp;
                 dist += h;
+                //printf("%.17e\n",z);
             }
             h = tmp;
             _Pragma ("GCC diagnostic push");

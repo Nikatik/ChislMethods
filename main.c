@@ -25,6 +25,8 @@ void all (void)
     func61();
 
     func71();
+    
+    func81();
 }
 
 int main (int argc, char* argv[])
@@ -68,12 +70,10 @@ int main (int argc, char* argv[])
                 func71();
                 break;
 
-                /*
-
-                            case '8':
-
-                                break;
-                */
+            case '8':
+                func81();
+                break;
+               
             default:
                 all();
         }

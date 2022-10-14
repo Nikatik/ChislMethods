@@ -211,7 +211,7 @@ void func61 (void)
                 i,
                 h);
 
-        while (T < 1.5 * pow (10., 6) * pi)
+        while (T < 1.5 * pow (10., 4) * pi)
         {
             x    = 0.;
             y    = 1.;
@@ -224,6 +224,7 @@ void func61 (void)
 
                 RK (0, &x, &y, h, s, k, cab, yf, xg, false);
                 dist += h;
+                //printf("%.17e\n",y);
             }
             h = tmp;
 

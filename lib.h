@@ -38,4 +38,6 @@ void RK (double,
 void func61 (void);
 
 void func71 (void);
+
+void func81 (void);
 #endif

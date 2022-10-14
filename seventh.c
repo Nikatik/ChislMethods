@@ -26,27 +26,28 @@ static double xg (double t, double x, double y)        // x`=xg(y,x)
 
 _Pragma ("GCC diagnostic pop")
 
-void astep (double T,
-            double* x,
-            double* y,
-            double* x_,
-            double* y_,
-            long long unsigned* i,
-            long long unsigned* j,
-            unsigned int p,
-            unsigned int s,
-            double** k,
-            double** cab,
-            double tol,
-            double f (double, double, double),
-            double g (double, double, double))
+double astep (double T,
+              double* x,
+              double* y,
+              double* x_,
+              double* y_,
+              long long unsigned* i,
+              long long unsigned* j,
+              unsigned int p,
+              unsigned int s,
+              double** k,
+              double** cab,
+              double tol,
+              double f (double, double, double),
+              double g (double, double, double))
 {
-    double tempx, tempy, dist, h, temp, fac;
+    double tempx, tempy, dist, h, temp, fac, err;
     *x_ = tempx = *x;
     *y_ = tempy = *y;
     dist        = 0;
     h           = 0.01;
     fac         = 1.7;
+    err         = 0;
     for (*i = *j = 0; T - dist > EPS;)
     {
         if (dist + h > T) h = T - dist;
@@ -64,7 +65,7 @@ void astep (double T,
         if (h<pow(10,-18))
         {
             printf("\nSomething goes wrong...\n");
-            return;
+            return 0;
         }
         if (fmax (fabs (tempx - *x_), fabs (tempy - *y_)) > tol)
         {
@@ -75,12 +76,14 @@ void astep (double T,
             continue;
         }
 
+        err += fmax (fabs (tempx - *x_), fabs (tempy - *y_));
         dist += temp;
         *x  = tempx;
         *y  = tempy;
         fac = 1.7;
         *i += 1;
     }
+    return err;
 }
 
 void func71 (void)
@@ -94,6 +97,7 @@ void func71 (void)
     double y;
     double x_;
     double y_;
+    double err;
 
     unsigned int s;
     unsigned int p;
@@ -179,12 +183,12 @@ void func71 (void)
         printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)  |      i      |      j\n",
                 tol);
-        for (; T < 1.5 * pow (10, 6) * pi;)
+        for (; T < 1.5 * pow (10, 4) * pi;)
         {
             x = 0;
             y = 1;
 
-            astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, yf, xg);
+            err = astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, yf, xg);
 
             _Pragma ("GCC diagnostic push");
             _Pragma ("GCC diagnostic ignored \"-Wfloat-equal\"");
@@ -194,12 +198,15 @@ void func71 (void)
             }
             _Pragma ("GCC diagnostic pop");
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu  | %10llu  \n",
+            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu  | %10llu  | %11.3e  | %11.3e  | %11.3e  \n",
                     T / pi,
                     x - x_,
                     y - y_,
                     i,
-                    j);
+                    j,
+                    err,
+                    x-sin(T),
+                    y-cos(T));
             if (T < 9 * pi)
             {
                 T += 5 * pi;
@@ -211,10 +218,10 @@ void func71 (void)
     }
     
     double tempx7 = 0, tempy7 = 1, tempx9 = 0, tempy9 = 1;
-    astep (pow(10,6)*pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), yf, xg);
-    astep (pow(10,6)*pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), yf, xg);
-    printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",pow(10,6),fabs((tempx7-tempx9)/(tempx9-x)),pow(10,6),fabs((tempy7-tempy9)/(tempy9-y)));
-    for(T=75*pow(10,4)*pi;T>10*pow(10,4)*pi;T-=25*pow(10,4)*pi)
+    astep (pow(10,4)*pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), yf, xg);
+    astep (pow(10,4)*pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), yf, xg);
+    printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",pow(10,4),fabs((tempx7-tempx9)/(tempx9-x)),pow(10,4),fabs((tempy7-tempy9)/(tempy9-y)));
+    for(T=75*pow(10,2)*pi;T>10*pow(10,2)*pi;T-=25*pow(10,2)*pi)
     {
         x=tempx7=tempx9=0;
         y=tempy7=tempy9=1;
@@ -237,7 +244,7 @@ void func71 (void)
         printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)  |      i       |      j\n",
                 tol);
-        for (; T < 1.5 * pow (10, 3) * pi;)
+        for (; T < 1.5 * pow (10, 2) * pi;)
         {
             x = 1;
             y = exp(1);
@@ -252,12 +259,13 @@ void func71 (void)
             }
             _Pragma ("GCC diagnostic pop");
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu   | %10llu  \n",
-                    T/pi,
+            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu  | %10llu  | %11.3e  \n",
+                    T / pi,
                     x - x_,
                     y - y_,
                     i,
-                    j);
+                    j,
+                    err);
 
             if (T < 9.*pi)
             {
@@ -271,10 +279,10 @@ void func71 (void)
     
     tempx7 = tempx9 = 1;
     tempy7 = tempy9 = exp(1);
-    astep (pow(10,3)*pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), myf, mxg);
-    astep (pow(10,3)*pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), myf, mxg);
-    printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",pow(10,3),fabs((tempx7-tempx9)/(tempx9-x)),pow(10,3),fabs((tempy7-tempy9)/(tempy9-y)));
-    for(T=750*pi;T>100*pi;T-=250*pi)
+    astep (pow(10,2)*pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-7), myf, mxg);
+    astep (pow(10,2)*pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab, pow(10,-9), myf, mxg);
+    printf("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n",pow(10,2),fabs((tempx7-tempx9)/(tempx9-x)),pow(10,2),fabs((tempy7-tempy9)/(tempy9-y)));
+    for(T=75*pi;T>10*pi;T-=25*pi)
     {
         x=tempx7=tempx9=1;
         y=tempy7=tempy9=exp(1);
@@ -301,5 +309,5 @@ void func71 (void)
     free (k);
     
     time (&end);
-    printf ("%.f seconds\n", difftime (end, start));
+    //printf ("%.f seconds\n", difftime (end, start));
 }
