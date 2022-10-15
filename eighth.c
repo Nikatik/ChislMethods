@@ -7,13 +7,14 @@ _Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"")
 
 static double yf (double t, double x, double y)        // y`=yf(x,y)
 {
-    return x;
+    //return x;
+    return cos(t)-(1+0.2*pow(x,2))*x;
 }
 
 static double xg (double t, double x, double y)        // x`=xg(y,x)
 {
     //return -y;
-    return cos(t)-(1+0.2*pow(y,2))*y;
+    return y;
 }
 
 _Pragma ("GCC diagnostic pop")
@@ -234,8 +235,8 @@ void func81 (void)
 
     printf ("Func 8.1: \n");
     
-    x = 0;
-    y = 1;
+    x = 1;
+    y = 0;
 /*
     x=cos(dist);
     y=sin(dist);
@@ -251,7 +252,7 @@ void func81 (void)
             y);
     
     printf ("\n");
-  //  */   
+//    */   
     /////////////////////////////////////////////////////////////////////////////////////////
 
     // cleaning :)
