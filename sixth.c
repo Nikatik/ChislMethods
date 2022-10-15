@@ -59,7 +59,8 @@ double rd (FILE* inpf)        // reading floating point number from a/b format
 
 _Pragma ("GCC diagnostic push")
 _Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"") 
-static double yf (double t, double x, double y)        // y`=yf(x,y)
+static double yf (
+        double t, double x, double y)        // y`=yf(x,y)
 {
     return -x;
 }
@@ -224,7 +225,7 @@ void func61 (void)
 
                 RK (0, &x, &y, h, s, k, cab, yf, xg, false);
                 dist += h;
-                //printf("%.17e\n",y);
+                // printf("%.17e\n",y);
             }
             h = tmp;
 
@@ -257,7 +258,7 @@ void func61 (void)
     /////////////////////////////////////////////////////////////////////////////////////////
 
     // cleaning :)
-    
+
     fclose (inpf);
     for (unsigned int i = 0; i < s + 3; i++)
     {

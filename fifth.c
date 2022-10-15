@@ -31,7 +31,7 @@ void func51 (void)
                 x += h * z;
                 z -= h * temp;
                 dist += h;
-                //printf("%.17e\n",z);
+                // printf("%.17e\n",z);
             }
             h = tmp;
             _Pragma ("GCC diagnostic push");
