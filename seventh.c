@@ -306,14 +306,15 @@ void func71 (void)
     {
         T = 5. * pi;
         printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
-                "z*(T)-z(T)  |      i       |      j\n",
+                "z*(T)-z(T)  |      i      |      j\n",
                 tol);
         for (; T < 1.5 * pow (10, 2) * pi;)
         {
             x = 1;
             y = exp (1);
-
-            astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, myf, mxg);
+            
+            err =
+                astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, myf, mxg);
 
             _Pragma ("GCC diagnostic push");
             _Pragma ("GCC diagnostic ignored \"-Wfloat-equal\"");
