@@ -1,11 +1,12 @@
 #include "lib.h"
+
 #include <stdlib.h>
 #include <time.h>
-#define EPSM pow (10, -10)
-#define DIST 0
+#define EPSM pow (10, -12)
+#define DIST 43.14
 
-_Pragma ("GCC diagnostic push")
-_Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"")
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 static double yf (double t, double x, double y)        // y`=yf(x,y)
 {
@@ -19,7 +20,7 @@ static double xg (double t, double x, double y)        // x`=xg(y,x)
     // return y;
 }
 
-_Pragma ("GCC diagnostic pop")
+#pragma GCC diagnostic pop
 
 void printing (double dist, double x, double y)
 {
@@ -27,19 +28,13 @@ void printing (double dist, double x, double y)
 
     printf ("Func 8.1: \n        t       | %6c       | %6c       \n", 'x', 'y');
     fractpart = modf (dist, &intpart);
-    printf ("%6.0f + %.3f  | %11.3e  | %11.3e  \n\n", intpart, fractpart, x, y);
+    printf ("%6.0f + %.3f  | %11.3e  | %11.3e  \n\n", intpart, fractpart,
+            x - cos (dist), y - sin (dist));
 }
 
-bool astepCH (double* startx,
-              double* starty,
-              double* dist,
-              double h,
-              unsigned int p,
-              unsigned int s,
-              double** k,
-              double** cab,
-              double tol,
-              double f (double, double, double),
+bool astepCH (double* startx, double* starty, double* dist, double h,
+              unsigned int p, unsigned int s, double** k, double** cab,
+              double tol, double f (double, double, double),
               double g (double, double, double))
 {
     double tempx;           //  next step x
@@ -52,9 +47,9 @@ bool astepCH (double* startx,
     double leftdist;        //  startx step distance
     double temp;            //  theoretical step
     double fac;             //  multiplier for step
-    bool first;
-    bool cross = false;
-    bool start = true;
+    bool   first;
+    bool   cross = false;
+    bool   start = true;
 
     leftx = x_ = tempx = x = *startx;
     y_ = tempy = y = *starty;
@@ -98,21 +93,20 @@ bool astepCH (double* startx,
                 fmax (fabs (tempy - *starty), fabs (y - *starty)) >
             1.02)        // next step crossed starty
         {
-            // if(fabs (leftx - tempx) / (fabs (tempx - *startx) + fabs (leftx -
-            // *startx)) < 0.98 && fabs(*dist - leftdist) > 5 * fabs(h)) //
-            // cross after full rotation
             if (cross)        // cross after full rotation
             {
-                // printf (" %39.3e  | %11.3e  | %11.3e  \n", fabs (leftx -
-                // tempx), fabs (tempx - *startx), fabs (leftx - *startx));
-                double _y = y, _x = x, _h = temp, _dist = *dist;
+                double lx = x, ly = y, ldist = *dist, _x = x, _y = y, _h = temp,
+                       _dist = *dist;
+
                 for (; fabs (_y - *starty) >
                        EPSM;)        // finding point of crossing
                 {
                     if ((_y - *starty) * (tempy - *starty) < 0)
                     {
-
-                        _h = fabs (_y - *starty) / fabs (tempy - _y) *
+                        lx    = _x;
+                        ly    = _y;
+                        ldist = _dist;
+                        _h    = fabs (_y - *starty) / fabs (tempy - _y) *
                              (*dist + temp -
                               _dist);        // step from _y to starty
 
@@ -121,13 +115,16 @@ bool astepCH (double* startx,
                     }
                     else
                     {
+                        tempx = _x;
+                        tempy = _y;
+                        temp  = _dist - *dist;
 
-                        _h = fabs (y - *starty) / fabs (y - _y) *
-                             (_dist - *dist);        // step from *y to starty
+                        _h = fabs (ly - *starty) / fabs (ly - _y) *
+                             (_dist - ldist);        // step from *y to starty
 
-                        _x    = x;
-                        _y    = y;
-                        _dist = *dist;
+                        _x    = lx;
+                        _y    = ly;
+                        _dist = ldist;
 
                         RK (_dist, &_x, &_y, _h, s, k, cab, f, g, false);
 
@@ -139,15 +136,7 @@ bool astepCH (double* startx,
                 tempy = y;
                 temp  = _dist - *dist;
 
-                RK (*dist,
-                    &tempx,
-                    &tempy,
-                    temp,
-                    s,
-                    k,
-                    cab,
-                    f,
-                    g,
+                RK (*dist, &tempx, &tempy, temp, s, k, cab, f, g,
                     false);        // counting starty point
 
                 if (fabs (leftx - tempx) > EPSM)
@@ -158,10 +147,7 @@ bool astepCH (double* startx,
                 }
                 cross = false;
             }
-            else
-            {
-                cross = true;
-            }
+            else { cross = true; }
 
             // printf (" %11.3e  | %9.3f  | %11.3e  | %11.3e  \t| %11.3e  |
             // %11.3e  \n", h, *dist/pi, tempx, tempy, *startx, leftx);
@@ -198,18 +184,18 @@ bool astepCH (double* startx,
 
 void func81 (void)
 {
-    double dist;
-    double tol           = EPSM * pow (10, -5);
-    long long unsigned i = 0;
-    long long unsigned j = 0;
+    double             dist;
+    double             tol = EPSM * pow (10, -5);
+    long long unsigned i   = 0;
+    long long unsigned j   = 0;
 
     double x;
     double y;
 
     unsigned int s;
     unsigned int p;
-    double** k;
-    double** cab;
+    double**     k;
+    double**     cab;
 
     time_t start, end;
 
@@ -236,19 +222,16 @@ void func81 (void)
 
     // CAB matrix initialization
 
-    cab = (double**)malloc ((s + 3) * sizeof (double*));
+    cab = (double**) malloc ((s + 3) * sizeof (double*));
     for (i = 0; i < s + 3; i++)
     {
-        cab[i] = (double*)malloc (s * sizeof (double));
-        for (j = 0; j < s; j++)
-        {
-            cab[i][j] = 0;
-        }
+        cab[i] = (double*) malloc (s * sizeof (double));
+        for (j = 0; j < s; j++) { cab[i][j] = 0; }
     }
 
-    k    = (double**)malloc (2 * sizeof (double*));
-    k[0] = (double*)malloc (s * sizeof (double));
-    k[1] = (double*)malloc (s * sizeof (double));
+    k    = (double**) malloc (2 * sizeof (double*));
+    k[0] = (double*) malloc (s * sizeof (double));
+    k[1] = (double*) malloc (s * sizeof (double));
     for (i = 0; i < s; i++)
     {
         k[0][i] = 0;
@@ -259,10 +242,7 @@ void func81 (void)
 
     // CAB matrix reading
 
-    for (i = 0; i < s; i++)
-    {
-        cab[0][i] = rd (inpf);
-    }
+    for (i = 0; i < s; i++) { cab[0][i] = rd (inpf); }
 
     for (i = 2; i < s + 3; i++)
         for (j = 0; j + 1 < i && j < s && !feof (inpf); j++)
@@ -288,11 +268,11 @@ void func81 (void)
     x = 1;
     y = 0;
 //  */
-//  /*
+    //  /*
     dist = DIST;
     x    = cos (dist);
     y    = sin (dist);
-//  */
+    //  */
     if (!astepCH (&x, &y, &dist, 0.01, p, s, k, cab, tol, yf, xg))
     {
         /*
@@ -300,11 +280,11 @@ void func81 (void)
         x = 1;
         y = 0;
 //      */
-//      /*
+        //      /*
         dist = DIST;
         x    = cos (dist);
         y    = sin (dist);
-//      */
+        //      */
         if (!astepCH (&x, &y, &dist, -0.01, p, s, k, cab, tol, yf, xg))
             printf ("\nSomething goes wrong...\n");
         else printing (dist, x, y);
@@ -316,10 +296,7 @@ void func81 (void)
     // cleaning :)
 
     fclose (inpf);
-    for (i = 0; i < s + 3; i++)
-    {
-        free (cab[i]);
-    }
+    for (i = 0; i < s + 3; i++) { free (cab[i]); }
     free (cab);
     free (k[0]);
     free (k[1]);

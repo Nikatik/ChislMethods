@@ -41,10 +41,7 @@ double dmf (double x)
 double el2 (double x, double h)
 {
     double res = x;
-    for (int i = 1; i * h < max2; i++)
-    {
-        res += h * dmf (h * i);
-    }
+    for (int i = 1; i * h < max2; i++) { res += h * dmf (h * i); }
     return res;
 }
 

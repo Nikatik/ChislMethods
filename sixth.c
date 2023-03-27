@@ -1,4 +1,5 @@
 #include "lib.h"
+
 #include <stdlib.h>
 
 /*
@@ -46,21 +47,21 @@ int rs (FILE* inpf)        // reading string with word separation
 */
 double rd (FILE* inpf)        // reading floating point number from a/b format
 {
-    int chisl = 0;
-    int znam  = 1;
+    int  chisl = 0;
+    int  znam  = 1;
     char tmp;
-    _Pragma ("GCC diagnostic push");
-    _Pragma ("GCC diagnostic ignored \"-Wunused-result\"");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
     fscanf (inpf, "%d", &chisl);
     if (fscanf (inpf, "%c", &tmp) && tmp == '/') fscanf (inpf, "%d", &znam);
-    _Pragma ("GCC diagnostic pop");
-    return ((double)chisl) / znam;
+#pragma GCC diagnostic pop
+    return ((double) chisl) / znam;
 }
 
-_Pragma ("GCC diagnostic push")
-_Pragma ("GCC diagnostic ignored \"-Wunused-parameter\"") 
-static double yf (
-        double t, double x, double y)        // y`=yf(x,y)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+static double yf (double t, double x, double y)        // y`=yf(x,y)
 {
     return -x;
 }
@@ -70,18 +71,12 @@ static double xg (double t, double x, double y)        // x`=xg(y,x)
     return y;
 }
 
-_Pragma ("GCC diagnostic pop")
+#pragma GCC diagnostic pop
 
-void RK (double t,
-         double* x0,
-         double* y0,
-         double h,
-         unsigned int s,
-         double** k,
-         double** cab,
-         double f (double, double, double),
+void RK (double t, double* x0, double* y0, double h, unsigned int s, double** k,
+         double** cab, double f (double, double, double),
          double g (double, double, double),
-         bool check)        // Runge–Kutta in general form
+         bool   check)        // Runge–Kutta in general form
 {
     double tempx;
     double tempy;
@@ -134,8 +129,8 @@ void func61 (void)
     double dist;
 
     unsigned int s;
-    double** k;
-    double** cab;
+    double**     k;
+    double**     cab;
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -158,19 +153,16 @@ void func61 (void)
 
     // CAB matrix initialization
 
-    cab = (double**)malloc ((s + 3) * sizeof (double*));
+    cab = (double**) malloc ((s + 3) * sizeof (double*));
     for (unsigned int i = 0; i < s + 3; i++)
     {
-        cab[i] = (double*)malloc (s * sizeof (double));
-        for (unsigned int j = 0; j < s; j++)
-        {
-            cab[i][j] = 0;
-        }
+        cab[i] = (double*) malloc (s * sizeof (double));
+        for (unsigned int j = 0; j < s; j++) { cab[i][j] = 0; }
     }
 
-    k    = (double**)malloc (2 * sizeof (double*));
-    k[0] = (double*)malloc (s * sizeof (double));
-    k[1] = (double*)malloc (s * sizeof (double));
+    k    = (double**) malloc (2 * sizeof (double*));
+    k[0] = (double*) malloc (s * sizeof (double));
+    k[1] = (double*) malloc (s * sizeof (double));
     for (unsigned int i = 0; i < s; i++)
     {
         k[0][i] = 0;
@@ -181,26 +173,22 @@ void func61 (void)
 
     // CAB matrix reading
 
-    for (unsigned int i = 0; i < s; i++)
-    {
-        cab[0][i] = rd (inpf);
-    }
+    for (unsigned int i = 0; i < s; i++) { cab[0][i] = rd (inpf); }
 
     for (unsigned int i = 2; i < s + 3; i++)
         for (unsigned int j = 0; j + 1 < i && j < s && !feof (inpf); j++)
             cab[i][j] = rd (inpf);
 
     // CAB matrix printing
-    /*
-            printf ("\n");
-            for (unsigned int i = 0; i < s + 3; i++)
-            {
-                for (unsigned int j = 0; j < s; j++)
-                    printf ("%6.3f ", cab[i][j]);
-                printf ("\n");
-            }
-            printf ("\n");
-        */
+    ///*
+    printf ("\n");
+    for (unsigned int i = 0; i < s + 3; i++)
+    {
+        for (unsigned int j = 0; j < s; j++) printf ("%6.3f ", cab[i][j]);
+        printf ("\n");
+    }
+    printf ("\n");
+    // */
     /////////////////////////////////////////////////////////////////////////////////////////
 
     // Runge–Kutta for harmonic oscillator
@@ -209,8 +197,7 @@ void func61 (void)
     {
         printf ("Func 6.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
-                i,
-                h);
+                i, h);
 
         while (T < 1.5 * pow (10., 4) * pi)
         {
@@ -229,17 +216,13 @@ void func61 (void)
             }
             h = tmp;
 
-            _Pragma ("GCC diagnostic push");
-            _Pragma ("GCC diagnostic ignored \"-Wfloat-equal\"");
-            if (x != x || y != y)
-            {
-                break;
-            }
-            _Pragma ("GCC diagnostic pop");
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  \n",
-                    T / pi,
-                    x - sin (T),
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+            if (x != x || y != y) { break; }
+#pragma GCC diagnostic pop
+
+            printf (" %7.0fPi   | %11.3e  | %11.3e  \n", T / pi, x - sin (T),
                     y - cos (T));
 
             if (T < 9. * pi)
@@ -260,10 +243,7 @@ void func61 (void)
     // cleaning :)
 
     fclose (inpf);
-    for (unsigned int i = 0; i < s + 3; i++)
-    {
-        free (cab[i]);
-    }
+    for (unsigned int i = 0; i < s + 3; i++) { free (cab[i]); }
     free (cab);
     free (k[0]);
     free (k[1]);

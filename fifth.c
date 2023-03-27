@@ -15,8 +15,7 @@ void func51 (void)
     {
         printf ("Func 5.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
-                i,
-                h);
+                i, h);
 
         while (T < 1.5 * pow (10., 4) * pi)
         {
@@ -34,18 +33,13 @@ void func51 (void)
                 // printf("%.17e\n",z);
             }
             h = tmp;
-            _Pragma ("GCC diagnostic push");
-            _Pragma ("GCC diagnostic ignored \"-Wfloat-equal\"");
-            if (x != x || z != z)
-            {
-                break;
-            }
-            _Pragma ("GCC diagnostic pop");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+            if (x != x || z != z) { break; }
+#pragma GCC diagnostic pop
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  \n",
-                    (int)T / pi,
-                    x - sin (T),
-                    z - cos (T));
+            printf (" %7.0fPi   | %11.3e  | %11.3e  \n", (int) T / pi,
+                    x - sin (T), z - cos (T));
 
             if (T < 9. * pi)
             {
