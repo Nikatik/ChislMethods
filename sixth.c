@@ -51,7 +51,7 @@ double rd (FILE* inpf)        // reading floating point number from a/b format
     int  znam  = 1;
     char tmp;
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-result"
     fscanf (inpf, "%d", &chisl);
     if (fscanf (inpf, "%c", &tmp) && tmp == '/') fscanf (inpf, "%d", &znam);
 #pragma GCC diagnostic pop
