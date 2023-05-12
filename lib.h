@@ -9,8 +9,8 @@
 #define pi  3.14159265359
 
 int    func1 (void);
-double func2 (void);
-double func3 (void);
+__float128 func2 (void);
+__float128 func3 (void);
 
 double func21 (void);
 double func22 (void);
