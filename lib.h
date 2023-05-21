@@ -16,7 +16,7 @@ double func21 (void);
 double func22 (void);
 double func23 (void);
 
-double mf (double);
+__float128 mf (__float128);
 void   func31 (void);
 
 void func41 (void);

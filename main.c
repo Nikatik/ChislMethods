@@ -5,7 +5,7 @@
 void all (void)
 {
     printf ("Func 1.a:%13.4Le\nFunc 1.b:%13.4Le\nFunc 1.c:%13.4Le\n",
-            ldexpl (1., -func1()), (long double)func2(), (long double)func3());
+            ldexpl ((long double)1., -func1()), (long double)func2(), (long double)func3());
 
     printf ("\nFunc 2.a:%13.4e\nFunc 2.b:%13.4e\nFunc 2.c:%13.4e\n", func21(),
             func22(), func23());
@@ -39,9 +39,9 @@ int main (int argc, char* argv[])
         {
             case '1':
                 printf ("Func 1.a:%13.4Le\nFunc 1.b:%13.4Le\nFunc 1.c:%13.4Le\n",
-                        ldexpl (1., -func1()), (long double)func2(), (long double)func3());
+                        ldexpl ((long double)1., -func1()), (long double)func2(), (long double)func3());
                 break;
-                
+
             case '2':
                 printf ("Func 2.a:%13.4e\nFunc 2.b:%13.4e\nFunc 2.c:%13.4e\n",
                         func21(), func22(), func23());

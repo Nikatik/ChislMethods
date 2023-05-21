@@ -35,7 +35,7 @@ __float128 func3 (void)
     __float128 x = (__float128) 0.;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-    for (int i = 0; x + (__float128) pow (10., 20) != x; i++)
+    for (int i = 0; x + (__float128) powl ((long double)10., (long double)20) != x; i++)
     {
         x += (__float128) ldexpl ((long double) 2., i / 20);
     }
