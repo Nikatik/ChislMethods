@@ -1,6 +1,5 @@
 #include "lib.h"
 
-#include <quadmath.h>
 #include <stdlib.h>
 #include <time.h>
 #define EPSM (__float128) pow (10, -25)
