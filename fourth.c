@@ -49,7 +49,7 @@ void func42 (void)
 {
     double x    = 9;
     double h    = 1;
-    double temp = mf (max2);
+    double temp = (double) mf (max2);
     printf ("\nFunc 4.b:\n  h     |      R1");
     while (h > pow (10., -5))
     {

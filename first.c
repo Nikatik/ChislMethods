@@ -1,4 +1,5 @@
 #include "lib.h"
+#include <quadmath.h>
 
 int func1 (void)
 {
@@ -12,7 +13,7 @@ int func1 (void)
 #pragma GCC diagnostic pop
             return i;
         }
-        eps = (__float128) ldexpl ((long double) 1., -i);
+        eps = ldexpq ((__float128) 1., -i);
     }
     return 0;
 }
@@ -24,7 +25,7 @@ __float128 func2 (void)
 #pragma GCC diagnostic ignored "-Wfloat-equal"
     for (int i = 0; x + (__float128) 1. != x; i++)
     {
-        x += (__float128) ldexpl ((long double) 2., i / 20);
+        x += ldexpq ((__float128) 2., i / 20);
     }
 #pragma GCC diagnostic pop
     return x;
@@ -35,9 +36,9 @@ __float128 func3 (void)
     __float128 x = (__float128) 0.;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-    for (int i = 0; x + (__float128) powl ((long double)10., (long double)20) != x; i++)
+    for (int i = 0; x + powq ((__float128)10., (__float128)20) != x; i++)
     {
-        x += (__float128) ldexpl ((long double) 2., i / 20);
+        x += ldexpq ((__float128) 2., i / 20);
     }
 #pragma GCC diagnostic pop
     return x;
