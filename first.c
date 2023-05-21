@@ -1,5 +1,4 @@
 #include "lib.h"
-#include <quadmath.h>
 
 int func1 (void)
 {

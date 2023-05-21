@@ -1,8 +1,5 @@
 #include "lib.h"
 
-#include <math.h>
-#include <quadmath.h>
-
 __float128 mf (__float128 x)
 {
     return powq (x, (__float128) 5) / (__float128) 5. -

@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#define EPSq powq ((__float128) 10, -30)
+
 /*
 int rs (FILE* inpf)        // reading string with word separation
 {
@@ -45,7 +47,8 @@ int rs (FILE* inpf)        // reading string with word separation
     return 1;
 }
 */
-double rd (FILE* inpf)        // reading floating point number from a/b format
+__float128
+    rd (FILE* inpf)        // reading floating point number from a/b format
 {
     int  chisl = 0;
     int  znam  = 1;
@@ -55,18 +58,20 @@ double rd (FILE* inpf)        // reading floating point number from a/b format
     fscanf (inpf, "%d", &chisl);
     if (fscanf (inpf, "%c", &tmp) && tmp == '/') fscanf (inpf, "%d", &znam);
 #pragma GCC diagnostic pop
-    return ((double) chisl) / znam;
+    return ((__float128) chisl) / znam;
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-static double yf (double t, double x, double y)        // y`=yf(x,y)
+static __float128 yfq (__float128 t, __float128 x,
+                       __float128 y)        // y`=yf(x,y)
 {
     return -x;
 }
 
-static double xg (double t, double x, double y)        // x`=xg(y,x)
+static __float128 xgq (__float128 t, __float128 x,
+                       __float128 y)        // x`=xg(y,x)
 {
     return y;
 }
@@ -118,19 +123,65 @@ void RK (double t, double* x0, double* y0, double h, unsigned int s, double** k,
     *y0 += h * tempy;
 }
 
+void RKq (__float128 t, __float128* x0, __float128* y0, __float128 h,
+          unsigned int s, __float128** k, __float128** cab,
+          __float128 g (__float128, __float128, __float128),
+          __float128 f (__float128, __float128, __float128),
+          bool       check)        // Runge–Kutta in general form
+{
+    __float128 tempx;
+    __float128 tempy;
+
+    for (unsigned int i = 0; i < s; i++)
+    {
+        tempx = 0;
+        tempy = 0;
+        for (unsigned int j = 0; j < i; j++)
+        {
+            tempx += cab[i + 1][j] * k[0][j];
+            tempy += cab[i + 1][j] * k[1][j];
+        }
+        // printf("%f\n",f(1,0));
+        k[0][i] = g (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
+        k[1][i] = f (t + h * cab[0][i], *x0 + h * tempx, *y0 + h * tempy);
+    }
+
+    tempx = 0;
+    tempy = 0;
+    if (check)
+    {
+        for (unsigned int i = 0; i < s; i++)
+        {
+            tempx += cab[s + 2][i] * k[0][i];
+            tempy += cab[s + 2][i] * k[1][i];
+        }
+    }
+    else
+    {
+        for (unsigned int i = 0; i < s; i++)
+        {
+            tempx += cab[s + 1][i] * k[0][i];
+            tempy += cab[s + 1][i] * k[1][i];
+        }
+    }
+
+    *x0 += h * tempx;
+    *y0 += h * tempy;
+}
+
 void func61 (void)
 {
-    double h = 1;
-    double T = 5 * pi;
-    double tmp;
+    __float128 h = 1;
+    __float128 T = 5 * (__float128) pi;
+    __float128 tmp;
 
-    double x;
-    double y;
-    double dist;
+    __float128 x;
+    __float128 y;
+    __float128 dist;
 
     unsigned int s;
-    double**     k;
-    double**     cab;
+    __float128** k;
+    __float128** cab;
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -153,16 +204,16 @@ void func61 (void)
 
     // CAB matrix initialization
 
-    cab = (double**) malloc ((s + 3) * sizeof (double*));
+    cab = (__float128**) malloc ((s + 3) * sizeof (__float128*));
     for (unsigned int i = 0; i < s + 3; i++)
     {
-        cab[i] = (double*) malloc (s * sizeof (double));
+        cab[i] = (__float128*) malloc (s * sizeof (__float128));
         for (unsigned int j = 0; j < s; j++) { cab[i][j] = 0; }
     }
 
-    k    = (double**) malloc (2 * sizeof (double*));
-    k[0] = (double*) malloc (s * sizeof (double));
-    k[1] = (double*) malloc (s * sizeof (double));
+    k    = (__float128**) malloc (2 * sizeof (__float128*));
+    k[0] = (__float128*) malloc (s * sizeof (__float128));
+    k[1] = (__float128*) malloc (s * sizeof (__float128));
     for (unsigned int i = 0; i < s; i++)
     {
         k[0][i] = 0;
@@ -180,7 +231,7 @@ void func61 (void)
             cab[i][j] = rd (inpf);
 
     // CAB matrix printing
-    ///*
+    /*
     printf ("\n");
     for (unsigned int i = 0; i < s + 3; i++)
     {
@@ -193,24 +244,25 @@ void func61 (void)
 
     // Runge–Kutta for harmonic oscillator
 
-    for (int i = 1; h > 5 * pow (10., -3); i++)
+    for (int i = 1; h > 5 * powq ((__float128) 10., -3); i++)
     {
-        printf ("Func 6.%d:\nh = %5.5f\n      T      |  x*(T)-x(T)  |  "
+        printf ("Func 6.%d:\nh = %5.5Lf\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
-                i, h);
+                i, (long double) h);
 
-        while (T < 1.5 * pow (10., 4) * pi)
+        while (T <
+               (__float128) 1.5 * powq ((__float128) 10., 4) * (__float128) pi)
         {
-            x    = 0.;
-            y    = 1.;
-            dist = 0;
+            dist = (__float128) 0.;
+            x    = sinq (dist);
+            y    = cosq (dist);
             tmp  = h;
 
-            for (; T - dist > EPS;)
+            for (; T - dist > EPSq;)
             {
                 if (dist + h > T) h = T - dist;
 
-                RK (0, &x, &y, h, s, k, cab, yf, xg, false);
+                RKq (dist, &x, &y, h, s, k, cab, xgq, yfq, false);
                 dist += h;
                 // printf("%.17e\n",y);
             }
@@ -222,20 +274,21 @@ void func61 (void)
             if (x != x || y != y) { break; }
 #pragma GCC diagnostic pop
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  \n", T / pi, x - sin (T),
-                    y - cos (T));
+            printf (" %7.0LfPi   | %11.3Le  | %11.3Le  \n",
+                    (long double) (T / (__float128) pi),
+                    (long double) (x - sinq (T)), (long double) (y - cosq (T)));
 
-            if (T < 9. * pi)
+            if (T < (__float128) 9. * (__float128) pi)
             {
-                T += 5 * pi;
+                T += 5 * (__float128) pi;
                 continue;
             }
-            T *= 10.;
+            T *= (__float128) 10.;
         }
 
-        T = 5 * pi;
+        T = 5 * (__float128) pi;
         printf ("\n");
-        h *= 0.1;
+        h *= (__float128) 0.1;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

@@ -242,11 +242,11 @@ void func81 (void)
 
     // CAB matrix reading
 
-    for (i = 0; i < s; i++) { cab[0][i] = rd (inpf); }
+    for (i = 0; i < s; i++) { cab[0][i] = (double) rd (inpf); }
 
     for (i = 2; i < s + 3; i++)
         for (j = 0; j + 1 < i && j < s && !feof (inpf); j++)
-            cab[i][j] = rd (inpf);
+            cab[i][j] = (double) rd (inpf);
 
     // CAB matrix printing
     /*
