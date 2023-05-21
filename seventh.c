@@ -6,60 +6,65 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-static double myf (double t, double x, double y)        // y`=yf(x,y)
+static __float128 myf (__float128 t, __float128 x,
+                       __float128 y)        // y`=yf(x,y)
 {
-    return -2 * t * y * log (fmax (x, pow (10, -3)));
+    return -2.Q * t * y * logq (fmaxq (x, (__float128) pow (10, -3)));
 }
 
-static double mxg (double t, double x, double y)        // x`=xg(y,x)
+static __float128 mxg (__float128 t, __float128 x,
+                       __float128 y)        // x`=xg(y,x)
 {
-    return 2 * t * x * log (fmax (y, pow (10, -3)));
+    return 2.Q * t * x * logq (fmaxq (y, (__float128) pow (10, -3)));
 }
 
-static double yf (double t, double x, double y)        // y`=yf(x,y)
+static __float128 yf (__float128 t, __float128 x,
+                      __float128 y)        // y`=yf(x,y)
 {
     return -x;
 }
 
-static double xg (double t, double x, double y)        // x`=xg(y,x)
+static __float128 xg (__float128 t, __float128 x,
+                      __float128 y)        // x`=xg(y,x)
 {
     return y;
 }
 
 #pragma GCC diagnostic pop
 
-double astep (double T, double* x, double* y, double* x_, double* y_,
-              long long unsigned* i, long long unsigned* j, unsigned int p,
-              unsigned int s, double** k, double** cab, double tol,
-              double f (double, double, double),
-              double g (double, double, double))
+__float128 astep (__float128 T, __float128* x, __float128* y, __float128* x_,
+                  __float128* y_, long long unsigned* i, long long unsigned* j,
+                  unsigned int p, unsigned int s, __float128** k,
+                  __float128** cab, __float128 tol,
+                  __float128 f (__float128, __float128, __float128),
+                  __float128 g (__float128, __float128, __float128))
 {
-    double tempx, tempy, dist, h, temp, fac, err;
+    __float128 tempx, tempy, dist, h, temp, fac, err;
     *x_ = tempx = *x;
     *y_ = tempy = *y;
     dist        = 0;
-    h           = 0.01;
-    fac         = 1.7;
+    h           = 0.01Q;
+    fac         = 1.7Q;
     err         = 0;
     for (*i = *j = 0; T - dist > EPS;)
     {
         if (dist + h > T) h = T - dist;
 
-        RK (dist, &tempx, &tempy, h, s, k, cab, f, g, false);
-        RK (dist, x_, y_, h, s, k, cab, f, g, true);
+        RKq (dist, &tempx, &tempy, h, s, k, cab, f, g, false);
+        RKq (dist, x_, y_, h, s, k, cab, f, g, true);
 
         temp = h;
-        h *= fmin (fac, fmax (0.7, pow (0.98 * tol /
-                                            fmax (fabs (tempx - *x_),
-                                                  fabs (tempy - *y_)),
-                                        1. / (p + 1))));
+        h *= fminq (fac, fmaxq (0.7Q, powq (0.98Q * tol /
+                                                fmaxq (fabsq (tempx - *x_),
+                                                       fabsq (tempy - *y_)),
+                                            1.Q / (p + 1))));
 
-        if (h < pow (10, -18))
+        if (h < (__float128) pow (10, -18))
         {
             printf ("\nSomething goes wrong...\n");
             return 0;
         }
-        if (fmax (fabs (tempx - *x_), fabs (tempy - *y_)) > tol)
+        if (fmaxq (fabsq (tempx - *x_), fabsq (tempy - *y_)) > tol)
         {
             *x_ = tempx = *x;
             *y_ = tempy = *y;
@@ -68,11 +73,11 @@ double astep (double T, double* x, double* y, double* x_, double* y_,
             continue;
         }
 
-        err += fmax (fabs (tempx - *x_), fabs (tempy - *y_));
+        err += fmaxq (fabsq (tempx - *x_), fabsq (tempy - *y_));
         dist += temp;
         *x  = tempx;
         *y  = tempy;
-        fac = 1.7;
+        fac = 1.7Q;
         *i += 1;
     }
     return err;
@@ -80,21 +85,21 @@ double astep (double T, double* x, double* y, double* x_, double* y_,
 
 void func71 (void)
 {
-    double             T   = 5. * pi;
-    double             tol = pow (10, -7);
+    __float128         T   = 5 * M_PIq;
+    __float128         tol = (__float128) pow (10, -7);
     long long unsigned i   = 0;
     long long unsigned j   = 0;
 
-    double x;
-    double y;
-    double x_;
-    double y_;
-    double err;
+    __float128 x;
+    __float128 y;
+    __float128 x_;
+    __float128 y_;
+    __float128 err;
 
     unsigned int s;
     unsigned int p;
-    double**     k;
-    double**     cab;
+    __float128** k;
+    __float128** cab;
 
     time_t start, end;
 
@@ -121,16 +126,16 @@ void func71 (void)
 
     // CAB matrix initialization
 
-    cab = (double**) malloc ((s + 3) * sizeof (double*));
+    cab = (__float128**) malloc ((s + 3) * sizeof (__float128*));
     for (i = 0; i < s + 3; i++)
     {
-        cab[i] = (double*) malloc (s * sizeof (double));
+        cab[i] = (__float128*) malloc (s * sizeof (__float128));
         for (j = 0; j < s; j++) { cab[i][j] = 0; }
     }
 
-    k    = (double**) malloc (2 * sizeof (double*));
-    k[0] = (double*) malloc (s * sizeof (double));
-    k[1] = (double*) malloc (s * sizeof (double));
+    k    = (__float128**) malloc (2 * sizeof (__float128*));
+    k[0] = (__float128*) malloc (s * sizeof (__float128));
+    k[1] = (__float128*) malloc (s * sizeof (__float128));
     for (i = 0; i < s; i++)
     {
         k[0][i] = 0;
@@ -141,11 +146,11 @@ void func71 (void)
 
     // CAB matrix reading
 
-    for (i = 0; i < s; i++) { cab[0][i] = (double) rd (inpf); }
+    for (i = 0; i < s; i++) { cab[0][i] = rd (inpf); }
 
     for (i = 2; i < s + 3; i++)
         for (j = 0; j + 1 < i && j < s && !feof (inpf); j++)
-            cab[i][j] = (double) rd (inpf);
+            cab[i][j] = rd (inpf);
 
     // CAB matrix printing
     /*
@@ -163,32 +168,51 @@ void func71 (void)
     // Runge-Kutta for harmonic oscillator
 
     printf ("Func 7.1: \n");
-    for (; tol > 5 * pow (10, -12); tol *= 0.01)
+
+    T = 10 * M_PIq;
+    printf ("Tolerance = %.0Le\n      T      |  x*(T)-x(T)  |  "
+            "z*(T)-z(T)  |      i      |      j\n",
+            (long double) pow (10, -20));
+    x = 0;
+    y = 1;
+    err = astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab,
+                 (__float128) pow (10, -20), xg, yf);
+
+    printf (" %7.0LfPi   | %11.3Le  | %11.3Le  | %10llu  | %10llu  | "
+            "%11.3Le  | %11.3Le  | %11.3Le  \n",
+            (long double) (T / M_PIq), (long double) (x - x_),
+            (long double) (y - y_), i, j, (long double) err,
+            (long double) (x - sinq (T)), (long double) (y - cosq (T)));
+    printf ("\n");
+
+    for (tol = (__float128) pow (10, -7); tol > 5 * (__float128) pow (10, -12);
+         tol *= 0.01Q)
     {
-        T = 5. * pi;
-        printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
+        T = 5 * M_PIq;
+        printf ("Tolerance = %.0Le\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)  |      i      |      j\n",
-                tol);
-        for (; T < 1.5 * pow (10, 4) * pi;)
+                (long double) tol);
+        for (; T < 1.5Q * (__float128) pow (10, 4) * M_PIq;)
         {
             x = 0;
             y = 1;
 
             err =
-                astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, yf, xg);
+                astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, xg, yf);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
             if (x != x || y != y || x_ != x_ || y_ != y_) { break; }
 #pragma GCC diagnostic pop
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu  | %10llu  | "
-                    "%11.3e  | %11.3e  | %11.3e  \n",
-                    T / pi, x - x_, y - y_, i, j, err, x - sin (T),
-                    y - cos (T));
-            if (T < 9 * pi)
+            printf (" %7.0LfPi   | %11.3Le  | %11.3Le  | %10llu  | %10llu  | "
+                    "%11.3Le  | %11.3Le  | %11.3Le  \n",
+                    (long double) (T / M_PIq), (long double) (x - x_),
+                    (long double) (y - y_), i, j, (long double) err,
+                    (long double) (x - sinq (T)), (long double) (y - cosq (T)));
+            if (T < 9 * M_PIq)
             {
-                T += 5 * pi;
+                T += 5 * M_PIq;
                 continue;
             }
             T *= 10;
@@ -196,28 +220,31 @@ void func71 (void)
         printf ("\n");
     }
 
-    double tempx7 = 0, tempy7 = 1, tempx9 = 0, tempy9 = 1;
-    astep (pow (10, 4) * pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab,
-           pow (10, -7), yf, xg);
-    astep (pow (10, 4) * pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab,
-           pow (10, -9), yf, xg);
-    printf ("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n", pow (10, 4),
-            fabs ((tempx7 - tempx9) / (tempx9 - x)), pow (10, 4),
-            fabs ((tempy7 - tempy9) / (tempy9 - y)));
-    for (T = 75 * pow (10, 2) * pi; T > 10 * pow (10, 2) * pi;
-         T -= 25 * pow (10, 2) * pi)
+    __float128 tempx7 = 0, tempy7 = 1, tempx9 = 0, tempy9 = 1;
+    astep ((__float128) pow (10, 4) * M_PIq, &tempx7, &tempy7, &x_, &y_, &i, &j,
+           p, s, k, cab, (__float128) pow (10, -7), xg, yf);
+    astep ((__float128) pow (10, 4) * M_PIq, &tempx9, &tempy9, &x_, &y_, &i, &j,
+           p, s, k, cab, (__float128) pow (10, -9), xg, yf);
+    printf ("Rx(%.1e*Pi) = %.0Lf\tRy(%.1e*Pi) = %.0Lf\n", pow (10, 4),
+            (long double) fabsq ((tempx7 - tempx9) / (tempx9 - x)), pow (10, 4),
+            (long double) fabsq ((tempy7 - tempy9) / (tempy9 - y)));
+    for (T = 75 * (__float128) pow (10, 2) * M_PIq;
+         T > 10 * (__float128) pow (10, 2) * M_PIq;
+         T -= 25 * (__float128) pow (10, 2) * M_PIq)
     {
         x = tempx7 = tempx9 = 0;
         y = tempy7 = tempy9 = 1;
         astep (T, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab,
-               pow (10, -7), yf, xg);
+               (__float128) pow (10, -7), xg, yf);
         astep (T, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab,
-               pow (10, -9), yf, xg);
-        astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, pow (10, -11), yf,
-               xg);
-        printf ("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n", T / pi,
-                fabs ((tempx7 - tempx9) / (tempx9 - x)), T / pi,
-                fabs ((tempy7 - tempy9) / (tempy9 - y)));
+               (__float128) pow (10, -9), xg, yf);
+        astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab,
+               (__float128) pow (10, -11), xg, yf);
+        printf ("Rx(%.1Lf*Pi) = %.0Lf\tRy(%.1Lf*Pi) = %.0Lf\n",
+                (long double) (T / M_PIq),
+                (long double) fabsq ((tempx7 - tempx9) / (tempx9 - x)),
+                (long double) (T / M_PIq),
+                (long double) fabsq ((tempy7 - tempy9) / (tempy9 - y)));
     }
     printf ("\n\n");
 
@@ -227,61 +254,81 @@ void func71 (void)
     // WTF!?1?
 
     printf ("Func 7.2: \n");
-    for (tol = pow (10, -7); tol > 5 * pow (10, -12); tol *= 0.01)
+
+    T = 10 * M_PIq;
+    printf ("Tolerance = %.0Le\n      T      |  x*(T)-x(T)  |  "
+            "z*(T)-z(T)  |      i      |      j\n",
+            (long double) pow (10, -20));
+    x = 1;
+    y = expq (1);
+    err = astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab,
+                 (__float128) pow (10, -20), mxg, myf);
+
+    printf (" %7.0LfPi   | %11.3Le  | %11.3Le  | %10llu  | %10llu  | "
+            "%11.3Le  \n",
+            (long double) (T / M_PIq), (long double) (x - x_),
+            (long double) (y - y_), i, j, (long double) err);
+    printf ("\n");
+
+    for (tol = (__float128) pow (10, -7); tol > 5 * (__float128) pow (10, -12);
+         tol *= 0.01Q)
     {
-        T = 5. * pi;
-        printf ("Tolerance = %.0e\n      T      |  x*(T)-x(T)  |  "
+        T = 5 * M_PIq;
+        printf ("Tolerance = %.0Le\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)  |      i      |      j\n",
-                tol);
-        for (; T < 1.5 * pow (10, 2) * pi;)
+                (long double) tol);
+        for (; T < 1.5Q * (__float128) pow (10, 2) * M_PIq;)
         {
             x = 1;
-            y = exp (1);
+            y = expq (1);
 
-            err = astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, myf,
-                         mxg);
+            err = astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, tol, mxg,
+                         myf);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
             if (x != x || y != y || x_ != x_ || y_ != y_) { break; }
 #pragma GCC diagnostic pop
 
-            printf (" %7.0fPi   | %11.3e  | %11.3e  | %10llu  | %10llu  | "
-                    "%11.3e  \n",
-                    T / pi, x - x_, y - y_, i, j, err);
+            printf (" %7.0LfPi   | %11.3Le  | %11.3Le  | %10llu  | %10llu  | "
+                    "%11.3Le  \n",
+                    (long double) (T / M_PIq), (long double) (x - x_),
+                    (long double) (y - y_), i, j, (long double) err);
 
-            if (T < 9. * pi)
+            if (T < 9 * M_PIq)
             {
-                T += 5. * pi;
+                T += 5 * M_PIq;
                 continue;
             }
-            T *= 10.;
+            T *= 10;
         }
         printf ("\n");
     }
 
     tempx7 = tempx9 = 1;
-    tempy7 = tempy9 = exp (1);
-    astep (pow (10, 2) * pi, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab,
-           pow (10, -7), myf, mxg);
-    astep (pow (10, 2) * pi, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab,
-           pow (10, -9), myf, mxg);
-    printf ("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n", pow (10, 2),
-            fabs ((tempx7 - tempx9) / (tempx9 - x)), pow (10, 2),
-            fabs ((tempy7 - tempy9) / (tempy9 - y)));
-    for (T = 75 * pi; T > 10 * pi; T -= 25 * pi)
+    tempy7 = tempy9 = expq (1);
+    astep ((__float128) pow (10, 2) * M_PIq, &tempx7, &tempy7, &x_, &y_, &i, &j,
+           p, s, k, cab, (__float128) pow (10, -7), mxg, myf);
+    astep ((__float128) pow (10, 2) * M_PIq, &tempx9, &tempy9, &x_, &y_, &i, &j,
+           p, s, k, cab, (__float128) pow (10, -9), mxg, myf);
+    printf ("Rx(%.1e*Pi) = %.0Lf\tRy(%.1e*Pi) = %.0Lf\n", pow (10, 2),
+            (long double) fabsq ((tempx7 - tempx9) / (tempx9 - x)), pow (10, 2),
+            (long double) fabsq ((tempy7 - tempy9) / (tempy9 - y)));
+    for (T = 75 * M_PIq; T > 10 * M_PIq; T -= 25 * M_PIq)
     {
         x = tempx7 = tempx9 = 1;
-        y = tempy7 = tempy9 = exp (1);
+        y = tempy7 = tempy9 = expq (1);
         astep (T, &tempx7, &tempy7, &x_, &y_, &i, &j, p, s, k, cab,
-               pow (10, -7), myf, mxg);
+               (__float128) pow (10, -7), mxg, myf);
         astep (T, &tempx9, &tempy9, &x_, &y_, &i, &j, p, s, k, cab,
-               pow (10, -9), myf, mxg);
-        astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab, pow (10, -11), myf,
-               mxg);
-        printf ("Rx(%.1e*Pi) = %.0f\tRy(%.1e*Pi) = %.0f\n", T / pi,
-                fabs ((tempx7 - tempx9) / (tempx9 - x)), T / pi,
-                fabs ((tempy7 - tempy9) / (tempy9 - y)));
+               (__float128) pow (10, -9), mxg, myf);
+        astep (T, &x, &y, &x_, &y_, &i, &j, p, s, k, cab,
+               (__float128) pow (10, -11), mxg, myf);
+        printf ("Rx(%.1Lf*Pi) = %.0Lf\tRy(%.1Lf*Pi) = %.0Lf\n",
+                (long double) (T / M_PIq),
+                (long double) fabsq ((tempx7 - tempx9) / (tempx9 - x)),
+                (long double) (T / M_PIq),
+                (long double) fabsq ((tempy7 - tempy9) / (tempy9 - y)));
     }
     printf ("\n\n");
 

@@ -5,7 +5,6 @@ void func51 (void)
     double h = 1;
     double T = 5 * pi;
     double tmp;
-
     double x;
     double z;
     double temp;
@@ -23,9 +22,9 @@ void func51 (void)
             z    = 1.;
             dist = 0.;
             tmp  = h;
-            for (; T - dist > EPS;)
+            for (; T - dist > EPSo;)
             {
-                if (dist + h + EPS > T) h = T - dist;
+                if (dist + h + EPSo > T) h = T - dist;
                 temp = x;
                 x += h * z;
                 z -= h * temp;

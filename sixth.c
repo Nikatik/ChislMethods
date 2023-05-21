@@ -2,8 +2,6 @@
 
 #include <stdlib.h>
 
-#define EPSq powq ((__float128) 10, -30)
-
 /*
 int rs (FILE* inpf)        // reading string with word separation
 {
@@ -58,7 +56,7 @@ __float128
     fscanf (inpf, "%d", &chisl);
     if (fscanf (inpf, "%c", &tmp) && tmp == '/') fscanf (inpf, "%d", &znam);
 #pragma GCC diagnostic pop
-    return ((__float128) chisl) / znam;
+    return (__float128) (chisl) / znam;
 }
 
 #pragma GCC diagnostic push
@@ -172,7 +170,7 @@ void RKq (__float128 t, __float128* x0, __float128* y0, __float128 h,
 void func61 (void)
 {
     __float128 h = 1;
-    __float128 T = 5 * (__float128) pi;
+    __float128 T = 5 * M_PIq;
     __float128 tmp;
 
     __float128 x;
@@ -244,21 +242,20 @@ void func61 (void)
 
     // Runge–Kutta for harmonic oscillator
 
-    for (int i = 1; h > 5 * powq ((__float128) 10., -3); i++)
+    for (int i = 1; h > 5 * (__float128) pow (10, -3); i++)
     {
         printf ("Func 6.%d:\nh = %5.5Lf\n      T      |  x*(T)-x(T)  |  "
                 "z*(T)-z(T)\n",
                 i, (long double) h);
 
-        while (T <
-               (__float128) 1.5 * powq ((__float128) 10., 4) * (__float128) pi)
+        while (T < 1.5Q * (__float128) pow (10, 4) * M_PIq)
         {
-            dist = (__float128) 0.;
+            dist = 0;
             x    = sinq (dist);
             y    = cosq (dist);
             tmp  = h;
 
-            for (; T - dist > EPSq;)
+            for (; T - dist > EPS;)
             {
                 if (dist + h > T) h = T - dist;
 
@@ -275,20 +272,20 @@ void func61 (void)
 #pragma GCC diagnostic pop
 
             printf (" %7.0LfPi   | %11.3Le  | %11.3Le  \n",
-                    (long double) (T / (__float128) pi),
-                    (long double) (x - sinq (T)), (long double) (y - cosq (T)));
+                    (long double) (T / M_PIq), (long double) (x - sinq (T)),
+                    (long double) (y - cosq (T)));
 
-            if (T < (__float128) 9. * (__float128) pi)
+            if (T < 9 * M_PIq)
             {
-                T += 5 * (__float128) pi;
+                T += 5 * M_PIq;
                 continue;
             }
-            T *= (__float128) 10.;
+            T *= 10;
         }
 
-        T = 5 * (__float128) pi;
+        T = 5 * M_PIq;
         printf ("\n");
-        h *= (__float128) 0.1;
+        h *= 0.1Q;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
