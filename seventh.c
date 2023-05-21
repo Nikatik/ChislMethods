@@ -265,9 +265,10 @@ void func71 (void)
                  (__float128) pow (10, -20), mxg, myf);
 
     printf (" %7.0LfPi   | %11.3Le  | %11.3Le  | %10llu  | %10llu  | "
-            "%11.3Le  \n",
+            "%11.3Le    | %11.3Le  | %11.3Le  \n",
             (long double) (T / M_PIq), (long double) (x - x_),
-            (long double) (y - y_), i, j, (long double) err);
+            (long double) (y - y_), i, j, (long double) err,
+            (long double) (x - expq(sinq (powq(T, 2)))), (long double) (y - expq(cosq (powq(T, 2)))));
     printf ("\n");
 
     for (tol = (__float128) pow (10, -7); tol > 5 * (__float128) pow (10, -12);
@@ -291,9 +292,10 @@ void func71 (void)
 #pragma GCC diagnostic pop
 
             printf (" %7.0LfPi   | %11.3Le  | %11.3Le  | %10llu  | %10llu  | "
-                    "%11.3Le  \n",
+                    "%11.3Le  \n| %11.3Le  | %11.3Le  \n",
                     (long double) (T / M_PIq), (long double) (x - x_),
-                    (long double) (y - y_), i, j, (long double) err);
+                    (long double) (y - y_), i, j, (long double) err,
+                    (long double) (x - expq(sinq (powq(T, 2)))), (long double) (y - expq(cosq (powq(T, 2)))));
 
             if (T < 9 * M_PIq)
             {
